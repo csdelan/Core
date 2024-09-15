@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="4.0.1" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<COMReference Include="MediaPlayer">
+			<WrapperTool>tlbimp</WrapperTool>
+			<VersionMinor>0</VersionMinor>
+			<VersionMajor>1</VersionMajor>
+			<Guid>22d6f304-b0f6-11d0-94ab-0080c74c7e95</Guid>
+			<Lcid>0</Lcid>
+			<Isolated>false</Isolated>
+			<EmbedInteropTypes>true</EmbedInteropTypes>
+		</COMReference>
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="xcopy /Y /D &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(SolutionDir)\..\..\output\&quot;&#xD;&#xA;xcopy /Y /D &quot;$(TargetDir)$(AssemblyName).pdb&quot; &quot;$(SolutionDir)\..\..\output\&quot;" />
+	</Target>
+
+</Project>
