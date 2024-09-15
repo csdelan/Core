@@ -1,6 +1,4 @@
-﻿// Core
-
-namespace Core
+﻿namespace Core
 {
     /// <summary>
     /// See: https://enterprisecraftsmanship.com/posts/value-object-better-implementation/
