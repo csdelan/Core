@@ -3,11 +3,16 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="xcopy /Y /D &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(SolutionDir)\..\..\output\&quot;&#xD;&#xA;xcopy /Y /D &quot;$(TargetDir)$(AssemblyName).pdb&quot; &quot;$(SolutionDir)\..\..\output\&quot;" />
 	</Target>
+
+	<ItemGroup>
+	  <PackageReference Include="Serilog" Version="4.0.1" />
+	  <PackageReference Include="System.Management" Version="9.0.0" />
+	</ItemGroup>
 
 </Project>
