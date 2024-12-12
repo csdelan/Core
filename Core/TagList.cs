@@ -10,7 +10,14 @@ namespace Core
 
     public class TagList : HashSet<string>
     {
-        public TagList() { }
+        public TagList() 
+        { }
+
+        public TagList(string[] tags)
+        {
+            this.UnionWith(tags);
+        }
+
         public override string ToString() 
         {
             StringBuilder sb = new StringBuilder();
