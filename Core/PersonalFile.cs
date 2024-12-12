@@ -32,7 +32,7 @@ namespace Core
         public string Subcategory { get; set; }
         public string FileType { get; set; }
         public FileStatus Status { get; set; }
-        public Tags Tags { get; set; }
+        public TagList Tags { get; set; }
         public DateTime CreateTime { get; set; }
         public ulong Size { get; set; }
 

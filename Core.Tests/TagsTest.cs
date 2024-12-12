@@ -9,62 +9,61 @@ namespace Core.Tests
         [Fact]
         public void EmptyTest()
         {
-            var tags = new Tags();
-            Assert.True(tags.TagsCollection.Count == 0);
-            Assert.True(tags.TagString.Trim() == string.Empty);
+            var tags = new TagList();
+            Assert.True(tags.Count == 0);
         }
 
         [Fact]
         public void AddTagTest()
         {
-            var tags = new Tags();
-            tags.AddTag("tag1");
-            tags.AddTag("tag2");
-            Assert.True(tags.TagsCollection.Count == 2);
-            Assert.True(tags.ContainsTag("tag1"));
-            Assert.True(tags.ContainsTag("tag2"));
-            Assert.False(tags.ContainsTag("tag3"));
+            var tags = new TagList();
+            tags.Add("tag1");
+            tags.Add("tag2");
+            Assert.True(tags.Count == 2);
+            Assert.Contains("tag1",tags);
+            Assert.Contains("tag2",tags);
+            Assert.DoesNotContain("tag3",tags);
         }
 
         [Fact]
         public void AddRemoveTagTest()
         {
-            var tags = new Tags();
-            tags.AddTag("tag1");
-            tags.AddTag("tag2");
-            tags.RemoveTag("tag1");
-            Assert.True(tags.TagsCollection.Count == 1);
-            Assert.False(tags.ContainsTag("tag1"));
-            Assert.True(tags.ContainsTag("tag2"));
-            Assert.False(tags.ContainsTag("tag3"));
+            var tags = new TagList();
+            tags.Add("tag1");
+            tags.Add("tag2");
+            tags.Remove("tag1");
+            Assert.True(tags.Count == 1);
+            Assert.DoesNotContain("tag1",tags);
+            Assert.Contains("tag2",tags);
+            Assert.DoesNotContain("tag3", tags);
         }
 
         [Fact]
         public void AddRedundantTagTest()
         {
-            var tags = new Tags();
-            tags.AddTag("tag1");
-            tags.AddTag("tag1");
-            Assert.True(tags.TagsCollection.Count == 1);
-            Assert.True(tags.ContainsTag("tag1"));
-            Assert.False(tags.ContainsTag("tag2"));
-            Assert.False(tags.ContainsTag("tag3"));
+            var tags = new TagList();
+            tags.Add("tag1");
+            tags.Add("tag1");
+            Assert.True(tags.Count == 1);
+            Assert.Contains("tag1",tags);
+            Assert.DoesNotContain("tag2",tags);
+            Assert.DoesNotContain("tag3",tags);
         }
 
         [Fact]
         public void RemoveRedundantTagTest()
         {
-            var tags = new Tags();
-            tags.AddTag("tag1");
-            tags.RemoveTag("tag2");
-            Assert.True(tags.TagsCollection.Count == 1);
-            Assert.True(tags.ContainsTag("tag1"));
-            Assert.False(tags.ContainsTag("tag2"));
-            Assert.False(tags.ContainsTag("tag3"));
-            tags.RemoveTag("tag1");
-            Assert.True(tags.TagsCollection.Count == 0);
-            tags.RemoveTag("tag1");
-            Assert.True(tags.TagsCollection.Count == 0);
+            var tags = new TagList();
+            tags.Add("tag1");
+            tags.Remove("tag2");
+            Assert.True(tags.Count == 1);
+            Assert.Contains("tag1",tags);
+            Assert.DoesNotContain("tag2",tags);
+            Assert.DoesNotContain("tag3",tags);
+            tags.Remove("tag1");
+            Assert.True(tags.Count == 0);
+            tags.Remove("tag1");
+            Assert.True(tags.Count == 0);
         }
     }
 }

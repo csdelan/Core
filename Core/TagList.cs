@@ -1,0 +1,25 @@
+﻿using System.Collections;
+using System.Text;
+
+namespace Core
+{
+    public interface ITaggable
+    {
+        public TagList Tags { get; set; }
+    }
+
+    public class TagList : HashSet<string>
+    {
+        public TagList() { }
+        public override string ToString() 
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach(string tag in this)
+            {
+                sb.Append(tag);
+                sb.Append(" ");
+            }
+            return sb.ToString().TrimEnd(' ');
+        }
+    }
+}
