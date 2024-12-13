@@ -20,11 +20,11 @@ namespace Core
 
         public override string ToString() 
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             foreach(string tag in this)
             {
                 sb.Append(tag);
-                sb.Append(" ");
+                sb.Append(' ');
             }
             return sb.ToString().TrimEnd(' ');
         }

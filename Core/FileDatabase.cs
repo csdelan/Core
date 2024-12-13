@@ -8,8 +8,8 @@ namespace Core
 {
     public class FileDatabase
     {
-        private HashSet<PersonalFile> _files = new HashSet<PersonalFile>();
-        private ComputerFileNodeRoots _nodeRootPaths;
+        private readonly HashSet<PersonalFile> _files = [];
+        private readonly ComputerFileNodeRoots _nodeRootPaths;
 
         //        public List<PersonalFileDb> Nodes { get; set; }
 

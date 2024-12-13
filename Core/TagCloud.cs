@@ -1,17 +1,12 @@
 ﻿namespace Core
 {
-    public class TagCloud
+    public class TagCloud(List<ITaggable> objectList)
     {
-        private List<ITaggable> objectList;
-
-        public TagCloud(List<ITaggable> objectList)
-        {
-            this.objectList = objectList;
-        }
+        private readonly List<ITaggable> objectList = objectList;
 
         public List<string> GetAllTags()
         {
-            TagList tags = new TagList();
+            TagList tags = [];
             foreach (ITaggable taggable in this.objectList)
             {
                 foreach (string tag in taggable.Tags)
@@ -19,19 +14,19 @@
                     tags.Add(tag);
                 }
             }
-            return tags.ToList();
+            return [.. tags];
         }
 
         public List<KeyValuePair<string,int>> GetTagStatistics()
         {
-            Dictionary<string, int> tagStatistics = new Dictionary<string, int>();
+            Dictionary<string, int> tagStatistics = [];
             foreach (ITaggable taggable in this.objectList)
             {
                 foreach (string tag in taggable.Tags)
                 {
-                    if (tagStatistics.ContainsKey(tag))
+                    if (tagStatistics.TryGetValue(tag, out int value))
                     {
-                        tagStatistics[tag]++;
+                        tagStatistics[tag]=++value;
                     }
                     else
                     {
@@ -40,7 +35,7 @@
                 }
             }
             var sortedDict = from entry in tagStatistics orderby entry.Value descending select entry;
-            return sortedDict.ToList();
+            return [.. sortedDict];
         }
     }
 }

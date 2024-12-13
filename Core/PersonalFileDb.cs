@@ -8,9 +8,10 @@ namespace Core
     /// </summary>
     public class PersonalFileDb
     {
-        private HashSet<PersonalFile> _files = new HashSet<PersonalFile>();
+        private readonly HashSet<PersonalFile> _files = [];
         private BackgroundWorker _rebuildWorker;
         public string RepoPath { get; private set; }
+        public string[] IncludePaths { get; }
         public string RepoName { get; private set; }
 
         /// <summary>
@@ -21,8 +22,9 @@ namespace Core
         public PersonalFileDb(string repoPath, string[] includePaths)
         {
             RepoPath = repoPath;
+            IncludePaths=includePaths;
             // Need to create the repo
-            FileInfo fi = new FileInfo(repoPath);
+            FileInfo fi = new(repoPath);
             RepoName = fi.Name;
         }
 
@@ -33,7 +35,7 @@ namespace Core
         public PersonalFileDb(string repoPath)
         {
             RepoPath = repoPath;
-            FileInfo fi = new FileInfo(repoPath);
+            FileInfo fi = new(repoPath);
             if (! fi.Exists)
             {
                 throw new FileNotFoundException("Repo file not found", repoPath);
@@ -73,7 +75,7 @@ namespace Core
             // Do the rebuild
             foreach (string filePath in Directory.EnumerateFiles(RepoPath, "*", SearchOption.AllDirectories))
             {
-                PersonalFile file = new PersonalFile(filePath);
+                PersonalFile file = new(filePath);
 //                Log.Information("{0} - Added files {1} to the database", RepoName, file.FilePath);
                 _files.Add(file);
 
