@@ -2,7 +2,7 @@
 {
     public class TagCloud(List<ITaggable> objectList)
     {
-        private readonly List<ITaggable> objectList = objectList;
+        private readonly List<ITaggable> objectList = objectList ?? throw new ArgumentNullException(nameof(objectList));
 
         public List<string> GetAllTags()
         {
