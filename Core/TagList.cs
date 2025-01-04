@@ -18,6 +18,12 @@ namespace Core
             this.UnionWith(tags);
         }
 
+        public TagList(string tags)
+        {
+            string[] substrings = tags.Split(' ',StringSplitOptions.TrimEntries);
+            this.UnionWith(substrings);
+        }
+
         public override string ToString() 
         {
             StringBuilder sb = new();
