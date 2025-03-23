@@ -10,7 +10,7 @@ namespace Core.Tests
 
         public class Taggable : ITaggable
         {
-            public TagList Tags { get; set; }
+            public required TagList Tags { get; set; }
         }
 
         [Fact]

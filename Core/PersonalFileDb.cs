@@ -8,8 +8,8 @@ namespace Core
     /// </summary>
     public class PersonalFileDb
     {
-        private readonly HashSet<PersonalFile> _files = [];
-        private BackgroundWorker _rebuildWorker;
+        private readonly HashSet<PersonalFile> _files = new();
+        private BackgroundWorker? _rebuildWorker;
         public string RepoPath { get; private set; }
         public string[] IncludePaths { get; }
         public string RepoName { get; private set; }
@@ -22,7 +22,7 @@ namespace Core
         public PersonalFileDb(string repoPath, string[] includePaths)
         {
             RepoPath = repoPath;
-            IncludePaths=includePaths;
+            IncludePaths = includePaths;
             // Need to create the repo
             FileInfo fi = new(repoPath);
             RepoName = fi.Name;
@@ -35,8 +35,9 @@ namespace Core
         public PersonalFileDb(string repoPath)
         {
             RepoPath = repoPath;
+            IncludePaths = Array.Empty<string>(); // Initialize IncludePaths to an empty array
             FileInfo fi = new(repoPath);
-            if (! fi.Exists)
+            if (!fi.Exists)
             {
                 throw new FileNotFoundException("Repo file not found", repoPath);
             }
@@ -47,7 +48,7 @@ namespace Core
 
         public void StartRebuild()
         {
-            if(_rebuildWorker != null)
+            if (_rebuildWorker != null)
             {
                 if (_rebuildWorker.IsBusy)
                 {
@@ -62,12 +63,12 @@ namespace Core
             _rebuildWorker.RunWorkerAsync();
         }
 
-        private void RebuildWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void RebuildWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e)
         {
             Log.Information("{0} - Rebuild complete", RepoName);
         }
 
-        private void RebuildWorkerImpl(object sender, DoWorkEventArgs e)
+        private void RebuildWorkerImpl(object? sender, DoWorkEventArgs e)
         {
             Log.Information("{0} - Rebuild started", RepoName);
             Log.Information("{0} - We are starting with {1} files in the database", RepoName, _files.Count);
@@ -76,11 +77,11 @@ namespace Core
             foreach (string filePath in Directory.EnumerateFiles(RepoPath, "*", SearchOption.AllDirectories))
             {
                 PersonalFile file = new(filePath);
-//                Log.Information("{0} - Added files {1} to the database", RepoName, file.FilePath);
+                // Log.Information("{0} - Added files {1} to the database", RepoName, file.FilePath);
                 _files.Add(file);
 
                 // Cancel check
-                if (_rebuildWorker.CancellationPending)
+                if (_rebuildWorker != null && _rebuildWorker.CancellationPending)
                 {
                     Log.Information("{0} - Cancelled rebuild", RepoName);
                     e.Cancel = true;

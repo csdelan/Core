@@ -19,20 +19,20 @@ namespace Core
         /// <summary>
         /// The name of the file collection node this file belongs to (eg. "Documents", "Pictures", "cf", etc.)
         /// </summary>
-        public string CollectionNode { get; set; }
+        public string CollectionNode { get; set; } = string.Empty;
 
         /// <summary>
         /// Relative path off the root of the collection node where this file is located
         /// </summary>
-        public string RelativePath { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
+        public string RelativePath { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public string Hash { get; private set; }
-        public string Category { get; set; }
-        public string Subcategory { get; set; }
-        public string FileType { get; set; }
+        public string Category { get; set; } = string.Empty;
+        public string Subcategory { get; set; } = string.Empty;
+        public string FileType { get; set; } = string.Empty;
         public FileStatus Status { get; set; }
-        public TagList Tags { get; set; }
+        public TagList Tags { get; set; } = new TagList();
         public DateTime CreateTime { get; set; }
         public ulong Size { get; set; }
 

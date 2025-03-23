@@ -1,6 +1,6 @@
 ﻿namespace Core
 {
-    public class TagCloud(List<ITaggable> objectList)
+    public class TagCloud(List<ITaggable>? objectList)
     {
         private readonly List<ITaggable> objectList = objectList ?? throw new ArgumentNullException(nameof(objectList));
 

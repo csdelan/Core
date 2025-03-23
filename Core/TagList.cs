@@ -17,8 +17,9 @@ namespace Core
             this.UnionWith(tags);
         }
 
-        public TagList(string tags)
+        public TagList(string? tags)
         {
+            // If the input string is null, empty, or whitespace, initialize an empty set.
             if (string.IsNullOrWhiteSpace(tags))
             {
                 // If the input string is null, empty, or whitespace, initialize an empty set.
