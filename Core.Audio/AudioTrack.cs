@@ -51,7 +51,6 @@ namespace Common
                 try
                 {
                     var currentState = mediaPlayer.PlayState;
-                    Log.Information(currentState.ToString());
                     var desiredState1 = MediaPlayer.MPPlayStateConstants.mpClosed;
                     var desiredState2 = MediaPlayer.MPPlayStateConstants.mpStopped;
                     return (mediaPlayer.PlayState == desiredState1 ||
