@@ -17,25 +17,17 @@
             return [.. tags];
         }
 
-        public List<KeyValuePair<string,int>> GetTagStatistics()
+        public List<KeyValuePair<string, int>> GetTagStatistics()
         {
-            Dictionary<string, int> tagStatistics = [];
-            foreach (ITaggable taggable in this.objectList)
+            Dictionary<string, int> tagStatistics = new();
+            foreach (ITaggable taggable in objectList)
             {
                 foreach (string tag in taggable.Tags)
                 {
-                    if (tagStatistics.TryGetValue(tag, out int value))
-                    {
-                        tagStatistics[tag]=++value;
-                    }
-                    else
-                    {
-                        tagStatistics[tag] = 1;
-                    }
+                    tagStatistics[tag] = tagStatistics.GetValueOrDefault(tag) + 1;
                 }
             }
-            var sortedDict = from entry in tagStatistics orderby entry.Value descending select entry;
-            return [.. sortedDict];
+            return tagStatistics.OrderByDescending(x => x.Value).ToList();
         }
     }
 }

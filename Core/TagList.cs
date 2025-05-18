@@ -4,7 +4,7 @@ namespace Core
 {
     public interface ITaggable
     {
-        public TagList Tags { get; set; }
+        public TagList Tags { get; }
     }
 
     public class TagList : HashSet<string>
@@ -40,15 +40,6 @@ namespace Core
             }
         }
 
-        public override string ToString() 
-        {
-            StringBuilder sb = new();
-            foreach(string tag in this)
-            {
-                sb.Append(tag);
-                sb.Append(' ');
-            }
-            return sb.ToString().TrimEnd(' ');
-        }
+        public override string ToString() => string.Join(" ", this);
     }
 }
