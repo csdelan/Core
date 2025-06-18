@@ -14,7 +14,11 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	<PropertyGroup>
+		<EnablePostBuildCopy Condition="'$(EnablePostBuildCopy)' == ''">true</EnablePostBuildCopy>
+	</PropertyGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(EnablePostBuildCopy)' == 'true' And '$(OS)' == 'Windows_NT' ">
 		<Exec Command="xcopy /Y /D &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(SolutionDir)\..\..\output\&quot;&#xD;&#xA;xcopy /Y /D &quot;$(TargetDir)$(AssemblyName).pdb&quot; &quot;$(SolutionDir)\..\..\output\&quot;" />
 	</Target>
 
