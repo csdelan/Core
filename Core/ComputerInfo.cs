@@ -14,7 +14,7 @@ namespace Core
             string processorId = string.Empty;
             ManagementObjectSearcher searcher = new("select ProcessorId from Win32_Processor");
             foreach (ManagementObject obj in searcher.Get())
-            {
+            { 
                 processorId = obj["ProcessorId"]?.ToString() ?? string.Empty;
                 break;
             }
