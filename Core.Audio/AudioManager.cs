@@ -24,6 +24,11 @@ namespace Common
             {
                 if (sequentialSoundPlayers.TryDequeue(out AudioTrack trackPlayer) == true)
                 {
+                    if (trackPlayer == null || trackPlayer.Uri != null)
+                    {
+                        Log.Warning("Attempted to play a null or empty track.");
+                        continue;
+                    }
                     Log.Information("Playing {0}", trackPlayer.Uri);
                     trackPlayer.Play();
                     while (!trackPlayer.IsDone)
