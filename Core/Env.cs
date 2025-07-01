@@ -34,6 +34,16 @@
             return connectionString;
         }
 
+        public static string GetGlobalSecret(string name)
+        {
+            var connectionString = Environment.GetEnvironmentVariable(name);
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException($"Global secret '{name}' is not set.");
+            }
+            return connectionString;
+        }
+
         public static string GetConfigFilename(string name)
         {
             if (string.IsNullOrEmpty(name))
