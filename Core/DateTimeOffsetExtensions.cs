@@ -17,5 +17,15 @@
         {
             return new DateTimeOffset(date.Year, month, day, date.Hour, date.Minute, date.Second, date.Offset);
         }
+
+        /// <summary>
+        /// Truncates a DateTimeOffset to the nearest minute by removing seconds and milliseconds
+        /// </summary>
+        public static DateTimeOffset TruncateToMinute(this DateTimeOffset dateTime)
+        {
+            var newDTO = new DateTimeOffset(dateTime.Year, dateTime.Month, dateTime.Day,
+                                    dateTime.Hour, dateTime.Minute, 0, dateTime.Offset);
+            return newDTO;
+        }
     }
 }
