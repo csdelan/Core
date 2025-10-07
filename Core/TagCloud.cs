@@ -2,12 +2,12 @@
 {
     public class TagCloud(List<ITaggable>? objectList)
     {
-        private readonly List<ITaggable> objectList = objectList ?? throw new ArgumentNullException(nameof(objectList));
+        private readonly List<ITaggable> _objectList = objectList ?? throw new ArgumentNullException(nameof(objectList));
 
         public List<string> GetAllTags()
         {
             TagList tags = [];
-            foreach (ITaggable taggable in this.objectList)
+            foreach (ITaggable taggable in this._objectList)
             {
                 foreach (string tag in taggable.Tags)
                 {
@@ -20,7 +20,7 @@
         public List<KeyValuePair<string, int>> GetTagStatistics()
         {
             Dictionary<string, int> tagStatistics = new();
-            foreach (ITaggable taggable in objectList)
+            foreach (ITaggable taggable in _objectList)
             {
                 foreach (string tag in taggable.Tags)
                 {
