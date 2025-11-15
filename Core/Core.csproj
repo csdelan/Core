@@ -2,9 +2,10 @@
 
   <Target Name="SetVersionFromGit" BeforeTargets="GetAssemblyVersion;GenerateNuspec" Condition=" '$(OS)' == 'Windows_NT' ">
     <Exec Command="git describe --tags" ConsoleToMSBuild="true" IgnoreExitCode="false">
-      <Output TaskParameter="ConsoleOutput" PropertyName="GitDescribe" />
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitDescribe"/>
     </Exec>
-    <PropertyGroup>
+	  
+  <PropertyGroup>
       <!-- Extracts '1.2.10' from 'v1.2-10-g01ee017' -->
       <Version>$([System.Text.RegularExpressions.Regex]::Match($(GitDescribe), `^v?(\d+\.\d+)-(\d+)-.*$`).Groups[1].Value).$([System.Text.RegularExpressions.Regex]::Match($(GitDescribe), `^v?(\d+\.\d+)-(\d+)-.*$`).Groups[2].Value)</Version>
       <PackageVersion>$(Version)</PackageVersion>
