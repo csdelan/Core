@@ -5,11 +5,6 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<PackageOutputPath>C:\Users\csdel\source\MyLocalNuget\</PackageOutputPath>
-	</PropertyGroup>
-
 	<ItemGroup>
 	  <PackageReference Include="GitVersion.MsBuild" Version="6.5.0">
 	    <PrivateAssets>all</PrivateAssets>
