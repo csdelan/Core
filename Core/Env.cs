@@ -1,5 +1,8 @@
 ﻿namespace Core
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum AppEnv
     {
         Dev,
