@@ -8,15 +8,12 @@
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageOutputPath>C:\Users\csdel\source\MyLocalNuget\</PackageOutputPath>
   </PropertyGroup>
 
 	<PropertyGroup>
 		<EnablePostBuildCopy Condition="'$(EnablePostBuildCopy)' == ''">true</EnablePostBuildCopy>
 	</PropertyGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(EnablePostBuildCopy)' == 'true' And '$(OS)' == 'Windows_NT' ">
-		<Exec Command="xcopy /Y /D &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(SolutionDir)\..\..\output\&quot;" />
-	</Target>
 
 	<ItemGroup>
 	  <PackageReference Include="GitVersion.MsBuild" Version="6.5.0">
