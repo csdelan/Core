@@ -12,7 +12,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
@@ -33,11 +33,13 @@
 	  <PackageReference Include="System.Management" Version="9.0.0" />
 	</ItemGroup>
 
-	<Target Name="CopyPackageToLocalFeed" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
-		<ItemGroup>
-			<PackageToCopy Include="@(PackageOutputs)" Condition="'%(PackageOutputs.PackageFileType)' == 'Package'" />
-		</ItemGroup>
-		<Copy SourceFiles="@(PackageToCopy)" DestinationFolder="C:\Users\csdel\source\MyLocalNuget\" />
+	<Target Name="PackAndDeployToLocalFeed" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+
+		<Message Text="--- PackAndDeployToLocalFeed TARGET IS RUNNING (using dotnet pack) ---" Importance="high" />
+
+		<Exec Command="dotnet pack &quot;$(MSBuildProjectFullPath)&quot; --configuration $(Configuration) --no-build --output &quot;C:\Users\csdel\source\MyLocalNuget\&quot;" />
+
+		<Message Text="--- PackAndDeployToLocalFeed TARGET FINISHED ---" Importance="high" />
 	</Target>
 
 </Project>
