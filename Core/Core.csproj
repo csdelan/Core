@@ -12,7 +12,8 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageOutputPath>C:\Users\csdel\source\MyLocalNuget\</PackageOutputPath>
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
@@ -32,14 +33,5 @@
 	  <PackageReference Include="Serilog" Version="4.0.1" />
 	  <PackageReference Include="System.Management" Version="9.0.0" />
 	</ItemGroup>
-
-	<Target Name="PackAndDeployToLocalFeed" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
-
-		<Message Text="--- PackAndDeployToLocalFeed TARGET IS RUNNING (using dotnet pack) ---" Importance="high" />
-
-		<Exec Command="dotnet pack &quot;$(MSBuildProjectFullPath)&quot; --configuration $(Configuration) --no-build --output &quot;C:\Users\csdel\source\MyLocalNuget\&quot;" />
-
-		<Message Text="--- PackAndDeployToLocalFeed TARGET FINISHED ---" Importance="high" />
-	</Target>
 
 </Project>
