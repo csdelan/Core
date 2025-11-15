@@ -1,1 +1,7 @@
-mode: Mainline
+File: GitVersion.yml
+````````
+mode: ContinuousDeployment
+branches: {}
+ignore:
+  sha: []
+merge-message-formats: {}
