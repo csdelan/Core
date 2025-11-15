@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageOutputPath>C:\Users\csdel\source\MyLocalNuget\</PackageOutputPath>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageOutputPath>C:\Users\csdel\source\MyLocalNuget\</PackageOutputPath>
+	</PropertyGroup>
 
 	<PropertyGroup>
 		<EnablePostBuildCopy Condition="'$(EnablePostBuildCopy)' == ''">true</EnablePostBuildCopy>
