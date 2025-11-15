@@ -1,5 +1,6 @@
 mode: ContinuousDeployment
 tag-prefix: v
+semantic-version-format: Loose
 branches: {}
 ignore:
   sha: []
