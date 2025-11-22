@@ -78,5 +78,87 @@ namespace Core.Tests
             Assert.True(tags.Count == 3);
             Assert.True(tags.ToString() == "tag3 tag1 tag2");
         }
+
+        [Fact]
+        public void StringArrayConstructor_ShouldInitializeTags()
+        {
+            // Arrange & Act
+            var tags = new TagList(new string[] { Tag1, Tag2, Tag3 });
+            
+            // Assert
+            Assert.Equal(3, tags.Count);
+            Assert.Contains(Tag1, tags);
+            Assert.Contains(Tag2, tags);
+            Assert.Contains(Tag3, tags);
+        }
+
+        [Fact]
+        public void StringArrayConstructor_WithDuplicates_ShouldRemoveDuplicates()
+        {
+            // Arrange & Act
+            var tags = new TagList(new string[] { Tag1, Tag2, Tag1, Tag3 });
+            
+            // Assert
+            Assert.Equal(3, tags.Count);
+            Assert.Contains(Tag1, tags);
+            Assert.Contains(Tag2, tags);
+            Assert.Contains(Tag3, tags);
+        }
+
+        [Fact]
+        public void StringConstructor_WithSpaceSeparatedTags_ShouldParseTags()
+        {
+            // Arrange & Act
+            var tags = new TagList("tag1 tag2 tag3");
+            
+            // Assert
+            Assert.Equal(3, tags.Count);
+            Assert.Contains("tag1", tags);
+            Assert.Contains("tag2", tags);
+            Assert.Contains("tag3", tags);
+        }
+
+        [Fact]
+        public void StringConstructor_WithExtraSpaces_ShouldTrimAndParse()
+        {
+            // Arrange & Act
+            var tags = new TagList("  tag1   tag2    tag3  ");
+            
+            // Assert
+            Assert.Equal(3, tags.Count);
+            Assert.Contains("tag1", tags);
+            Assert.Contains("tag2", tags);
+            Assert.Contains("tag3", tags);
+        }
+
+        [Fact]
+        public void StringConstructor_WithNullString_ShouldCreateEmptySet()
+        {
+            // Arrange & Act
+            var tags = new TagList((string?)null);
+            
+            // Assert
+            Assert.Equal(0, tags.Count);
+        }
+
+        [Fact]
+        public void StringConstructor_WithEmptyString_ShouldCreateEmptySet()
+        {
+            // Arrange & Act
+            var tags = new TagList(string.Empty);
+            
+            // Assert
+            Assert.Equal(0, tags.Count);
+        }
+
+        [Fact]
+        public void StringConstructor_WithWhitespaceString_ShouldCreateEmptySet()
+        {
+            // Arrange & Act
+            var tags = new TagList("   ");
+            
+            // Assert
+            Assert.Equal(0, tags.Count);
+        }
     }
 }
