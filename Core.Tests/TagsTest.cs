@@ -10,7 +10,7 @@ namespace Core.Tests
         public void EmptyTest()
         {
             var tags = new TagList();
-            Assert.True(tags.Count == 0);
+            Assert.Empty(tags);
         }
 
         [Fact]
@@ -19,7 +19,7 @@ namespace Core.Tests
             var tags = new TagList();
             tags.Add(Tag1);
             tags.Add(Tag2);
-            Assert.True(tags.Count == 2);
+            Assert.Equal(2, tags.Count);
             Assert.Contains(Tag1,tags);
             Assert.Contains(Tag2,tags);
             Assert.DoesNotContain(Tag3,tags);
@@ -32,7 +32,7 @@ namespace Core.Tests
             tags.Add(Tag1);
             tags.Add(Tag2);
             tags.Remove(Tag1);
-            Assert.True(tags.Count == 1);
+            Assert.Single(tags);
             Assert.DoesNotContain(Tag1,tags);
             Assert.Contains(Tag2,tags);
             Assert.DoesNotContain(Tag3, tags);
@@ -44,7 +44,7 @@ namespace Core.Tests
             var tags = new TagList();
             tags.Add(Tag1);
             tags.Add(Tag1);
-            Assert.True(tags.Count == 1);
+            Assert.Single(tags);
             Assert.Contains(Tag1,tags);
             Assert.DoesNotContain(Tag2,tags);
             Assert.DoesNotContain(Tag3,tags);
@@ -56,27 +56,27 @@ namespace Core.Tests
             var tags = new TagList();
             tags.Add(Tag1);
             tags.Remove(Tag2);
-            Assert.True(tags.Count == 1);
+            Assert.Single(tags);
             Assert.Contains(Tag1,tags);
             Assert.DoesNotContain(Tag2,tags);
             Assert.DoesNotContain(Tag3,tags);
             tags.Remove(Tag1);
-            Assert.True(tags.Count == 0);
+            Assert.Empty(tags);
             tags.Remove(Tag1);
-            Assert.True(tags.Count == 0);
+            Assert.Empty(tags);
         }
 
         [Fact]
         public void TagToStringTest()
         {
             var tags = new TagList();
-            Assert.True(tags.ToString() == string.Empty);
+            Assert.Equal(string.Empty, tags.ToString());
 
             tags.Add(Tag3);
             tags.Add(Tag1);
             tags.Add(Tag2);
-            Assert.True(tags.Count == 3);
-            Assert.True(tags.ToString() == "tag3 tag1 tag2");
+            Assert.Equal(3, tags.Count);
+            Assert.Equal("tag3 tag1 tag2", tags.ToString());
         }
 
         [Fact]
@@ -138,7 +138,7 @@ namespace Core.Tests
             var tags = new TagList((string?)null);
             
             // Assert
-            Assert.Equal(0, tags.Count);
+            Assert.Empty(tags);
         }
 
         [Fact]
@@ -148,7 +148,7 @@ namespace Core.Tests
             var tags = new TagList(string.Empty);
             
             // Assert
-            Assert.Equal(0, tags.Count);
+            Assert.Empty(tags);
         }
 
         [Fact]
@@ -158,7 +158,7 @@ namespace Core.Tests
             var tags = new TagList("   ");
             
             // Assert
-            Assert.Equal(0, tags.Count);
+            Assert.Empty(tags);
         }
     }
 }
