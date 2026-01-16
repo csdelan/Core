@@ -31,8 +31,11 @@
 	</Target>
 	
 	<ItemGroup>
+	  <PackageReference Include="GitVersion.MsBuild" Version="6.5.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 	  <PackageReference Include="Serilog" Version="4.0.1" />
 	  <PackageReference Include="System.Management" Version="9.0.0" />
 	</ItemGroup>
-
 </Project>

@@ -1,7 +1,7 @@
 ﻿namespace Core
 {
     public enum EventStatus
-    {
+    { 
         Unread,
         Read,
         Processing,

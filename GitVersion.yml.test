@@ -1,0 +1,5 @@
+mode: Mainline
+tag-prefix: v
+semantic-version-format: Loose
+ignore:
+  sha: []
