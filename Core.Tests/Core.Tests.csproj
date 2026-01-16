@@ -8,6 +8,7 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <NoWarn>$(NoWarn);CS8600;CS8602;CS8603;CS8604;CS8618;CS0219;CS0168;CS8601;CS8625</NoWarn>
+    <Configurations>Debug;Release;DebugIsolated</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
