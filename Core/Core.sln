@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.2.11408.102 d18.0
+VisualStudioVersion = 18.2.11408.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core.csproj", "{5789E589-A146-466A-A85F-BD134F5A415E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "..\Core.Tests\Core.Tests.csproj", "{28993EE2-316D-4F1D-9655-6F8E84269DB4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.GoogleSheets", "..\Core.GoogleSheets\Core.GoogleSheets.csproj", "{36A88E07-C63C-4592-BC7B-4A579ACC4622}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Audio", "..\Core.Audio\Core.Audio.csproj", "{54FE59E6-5F42-EF2A-4BD6-3C02416FCC87}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,12 +24,6 @@ Global
 		{5789E589-A146-466A-A85F-BD134F5A415E}.DebugPackage|Any CPU.Build.0 = DebugPackage|Any CPU
 		{5789E589-A146-466A-A85F-BD134F5A415E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5789E589-A146-466A-A85F-BD134F5A415E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{672DCB92-93D1-4CDD-BE3C-C11F8A3E5F80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{672DCB92-93D1-4CDD-BE3C-C11F8A3E5F80}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{672DCB92-93D1-4CDD-BE3C-C11F8A3E5F80}.DebugPackage|Any CPU.ActiveCfg = DebugPackage|Any CPU
-		{672DCB92-93D1-4CDD-BE3C-C11F8A3E5F80}.DebugPackage|Any CPU.Build.0 = DebugPackage|Any CPU
-		{672DCB92-93D1-4CDD-BE3C-C11F8A3E5F80}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{672DCB92-93D1-4CDD-BE3C-C11F8A3E5F80}.Release|Any CPU.Build.0 = Release|Any CPU
 		{28993EE2-316D-4F1D-9655-6F8E84269DB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{28993EE2-316D-4F1D-9655-6F8E84269DB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28993EE2-316D-4F1D-9655-6F8E84269DB4}.DebugPackage|Any CPU.ActiveCfg = DebugPackage|Any CPU
@@ -36,8 +32,16 @@ Global
 		{28993EE2-316D-4F1D-9655-6F8E84269DB4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{36A88E07-C63C-4592-BC7B-4A579ACC4622}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{36A88E07-C63C-4592-BC7B-4A579ACC4622}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36A88E07-C63C-4592-BC7B-4A579ACC4622}.DebugPackage|Any CPU.ActiveCfg = Debug|Any CPU
+		{36A88E07-C63C-4592-BC7B-4A579ACC4622}.DebugPackage|Any CPU.Build.0 = Debug|Any CPU
 		{36A88E07-C63C-4592-BC7B-4A579ACC4622}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36A88E07-C63C-4592-BC7B-4A579ACC4622}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54FE59E6-5F42-EF2A-4BD6-3C02416FCC87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54FE59E6-5F42-EF2A-4BD6-3C02416FCC87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54FE59E6-5F42-EF2A-4BD6-3C02416FCC87}.DebugPackage|Any CPU.ActiveCfg = DebugPackage|Any CPU
+		{54FE59E6-5F42-EF2A-4BD6-3C02416FCC87}.DebugPackage|Any CPU.Build.0 = DebugPackage|Any CPU
+		{54FE59E6-5F42-EF2A-4BD6-3C02416FCC87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54FE59E6-5F42-EF2A-4BD6-3C02416FCC87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
