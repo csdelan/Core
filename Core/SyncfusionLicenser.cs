@@ -3,12 +3,13 @@ using Syncfusion.Licensing;
 
 namespace Core
 {
-    static internal class SyncfusionLicenser
+    static public class SyncfusionLicenser
     {
-        static internal void RegisterLicense()
+        public static void Register(string versionString)
         {
             // Read Environment Variable for Syncfusion license key
-            var licenseKey = Environment.GetEnvironmentVariable("SYNCFUSIONKEY_27_2_2");
+            var vsString = versionString.Replace(".", "_");
+            var licenseKey = Environment.GetEnvironmentVariable("SYNCFUSIONKEY_" + vsString);
             if (licenseKey != null)
             {
                 // Syncfusion license registration
@@ -18,7 +19,7 @@ namespace Core
             }
 
             // Syncfusion license registration
-            Log.Debug("Syncfusion license not found in environment variable: SYNCFUSIONKEY_27_2_2");
+            Log.Debug("Syncfusion license not found in environment variable: SYNCFUSIONKEY_" + vsString);
         }
     }
 }
