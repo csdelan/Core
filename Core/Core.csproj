@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;DebugPackage</Configurations>
@@ -39,6 +39,6 @@
 	  </PackageReference>
 	  <PackageReference Include="Serilog" Version="4.0.1" />
 	  <PackageReference Include="Syncfusion.Licensing" Version="27.2.2" />
-	  <PackageReference Include="System.Management" Version="9.0.0" />
+	  <PackageReference Include="System.Management" Version="10.0.3" />
 	</ItemGroup>
 </Project>
