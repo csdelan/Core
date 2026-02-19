@@ -7,6 +7,8 @@
     <Configurations>Debug;Release;DebugPackage</Configurations>
     <VersionPrefix>1.0.2</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
+	<BaseOutputPath>..\..\bin\</BaseOutputPath>
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
