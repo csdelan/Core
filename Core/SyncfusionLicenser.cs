@@ -9,7 +9,8 @@ namespace Core
         {
             // Read Environment Variable for Syncfusion license key
             var vsString = versionString.Replace(".", "_");
-            var licenseKey = Environment.GetEnvironmentVariable("SYNCFUSIONKEY_" + vsString);
+            EnvironmentVariableTarget target = EnvironmentVariableTarget.Machine;
+            var licenseKey = Environment.GetEnvironmentVariable("SYNCFUSIONKEY_" + vsString, target);
             if (licenseKey != null)
             {
                 // Syncfusion license registration
