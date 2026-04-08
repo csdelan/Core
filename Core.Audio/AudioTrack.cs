@@ -26,6 +26,8 @@ namespace Common
 
         public void Play()
         {
+            if (Uri == null)
+                throw new InvalidOperationException("Cannot play an AudioTrack without a Uri.");
             Play(Uri);
         }
 
