@@ -23,28 +23,6 @@ Main types and helpers exposed by `Core.dll`:
 - `SyncfusionLicenser`: optional Syncfusion license registration helper
 - `ComputerInfo`: Windows-specific machine information helper
 
-## Referencing Core.dll
-
-During development, prefer a project reference:
-
-```xml
-<ItemGroup>
-  <ProjectReference Include="..\Core\Core.csproj" />
-</ItemGroup>
-```
-
-For a published output, reference the generated `Core.dll` from your application:
-
-```xml
-<ItemGroup>
-  <Reference Include="Core">
-    <HintPath>libs\Core.dll</HintPath>
-  </Reference>
-</ItemGroup>
-```
-
-If you consume the DLL directly, keep its runtime dependencies with it when deploying your app.
-
 ## Typical Usage
 
 ### Value objects
