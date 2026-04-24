@@ -7,15 +7,11 @@
     <Configurations>Debug;Release;DebugPackage</Configurations>
     <VersionPrefix>1.0.2</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
-	<BaseOutputPath>..\..\bin\</BaseOutputPath>
+	<BaseOutputPath></BaseOutputPath>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugPackage|AnyCPU'">
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
@@ -28,10 +24,9 @@
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 	</PropertyGroup>
 
-	<Target Name="PushToLocalFeed" AfterTargets="Pack">
-		<Exec Command="dotnet nuget push &quot;$(OutputPath)..\$(PackageId).$(PackageVersion).nupkg&quot; --source &quot;Local Nuget&quot; --skip-duplicate" />
-	</Target>
-	
+	<ItemGroup>
+		<None Include="..\README.md" Link="README.md" CopyToPublishDirectory="Always" />
+	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="GitVersion.MsBuild" Version="6.5.0">
 	    <PrivateAssets>all</PrivateAssets>
