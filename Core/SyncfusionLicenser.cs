@@ -1,8 +1,8 @@
 ﻿using Serilog;
-using Syncfusion.Licensing;
 
 namespace Core
 {
+    [Obsolete("This class is deprecated. Syncfusion license registration should be handled in the application startup code.")]
     static public class SyncfusionLicenser
     {
         public static void Register(string versionString)
@@ -14,7 +14,7 @@ namespace Core
             if (licenseKey != null)
             {
                 // Syncfusion license registration
-                SyncfusionLicenseProvider.RegisterLicense(licenseKey);
+                //SyncfusionLicenseProvider.RegisterLicense(licenseKey);
                 Log.Debug("Syncfusion license registered from Environment Variable");
                 return;
             }
