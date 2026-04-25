@@ -22,9 +22,27 @@ dotnet build .\Core\Core.csproj -c Debug --nologo
 dotnet test .\Core.Tests\Core.Tests.csproj --nologo
 dotnet build .\Core.GoogleSheets\Core.GoogleSheets.csproj -c Debug --nologo
 dotnet build .\Core\Core.sln -c Debug --nologo
+.\Core\Publish-Nuget.ps1 -LocalFeedPath '.\LocalNuGetFeed' -Configuration Debug
 ```
 
 Use project-level builds when you do not need the full solution. That is usually faster and avoids unnecessary failures from platform-specific projects.
+
+## NuGet Packaging
+
+- `Core\Core.csproj` packs both `README.md` and `AGENTS.md` into the NuGet package.
+- `README.md` is also declared as the package readme via `PackageReadmeFile`.
+- Use `Core\Publish-Nuget.ps1` to build, pack, and push the package to a local folder feed or UNC share.
+- `LocalFeedPath` supports both relative paths such as `.\LocalNuGetFeed` and rooted UNC paths such as `\\server\share\NuGet`.
+- For UNC usage, the share itself must already exist. The script can create subfolders inside an existing share, but it cannot create the SMB share.
+- Package artifacts are written to `Core\artifacts\` before being pushed.
+- The script skips symbol packages and pushes only `.nupkg` files.
+
+### Package Versioning
+
+- `Core\Core.csproj` currently declares `VersionPrefix` as the intended package version source.
+- `Core\Publish-Nuget.ps1` reads the version from the project file and passes it explicitly to `dotnet build` and `dotnet pack`.
+- The script sets `/p:UpdateVersionProperties=false` so `GitVersion.MsBuild` does not rewrite the NuGet package version to its fallback value.
+- To change the published NuGet version for this workflow, update `VersionPrefix` in `Core\Core.csproj`.
 
 ## Important Constraints
 
@@ -44,6 +62,7 @@ dotnet tool install --global GitVersion.Tool
 - Prefer editing and validating the smallest relevant project instead of always building the solution.
 - Run `Core.Tests` for changes in the main `Core` library.
 - Avoid changing generated files under `bin\` or `obj\`.
+- Avoid changing generated files under `artifacts\`.
 - Keep public API changes deliberate; this repo provides reusable primitives consumed elsewhere.
 
 ## Notable Code Areas

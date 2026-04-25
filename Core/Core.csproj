@@ -5,8 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;DebugPackage</Configurations>
-    <VersionPrefix>1.0.2</VersionPrefix>
-	<VersionSuffix></VersionSuffix>
+    <VersionPrefix>1.0.0</VersionPrefix>
+	<VersionSuffix>Stable</VersionSuffix>
 	<BaseOutputPath></BaseOutputPath>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
@@ -21,11 +21,17 @@
 
 	<PropertyGroup>
 		<EnablePostBuildCopy Condition="'$(EnablePostBuildCopy)' == ''">true</EnablePostBuildCopy>
-		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\README.md" Link="README.md" CopyToPublishDirectory="Always" />
+	  <None Remove="Publish-LocalNuGet.ps1" />
+	</ItemGroup>
+
+	<ItemGroup>
+        <None Include="..\README.md" Link="README.md" CopyToPublishDirectory="Always" Pack="true" PackagePath="" />
+        <None Include="..\AGENTS.md" Link="AGENTS.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="GitVersion.MsBuild" Version="6.5.0">
