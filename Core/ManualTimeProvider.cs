@@ -222,7 +222,21 @@ namespace Core
                 target = _now + delta;
             }
 
-            SetUtcNow(target);
+            try
+            {
+                SetUtcNow(target);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                // A concurrent Advance may have moved _now past our computed target between
+                // when we read _now above and when SetUtcNow checks it. If the clock is
+                // already at or past our target the intent is satisfied; only re-throw if it
+                // somehow hasn't reached our target (which would be a genuine backwards move).
+                lock (_lock)
+                {
+                    if (_now < target) throw;
+                }
+            }
         }
 
         /// <summary>
