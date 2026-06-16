@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$ProjectPath = (Join-Path $PSScriptRoot 'Core.csproj'),
+    [string]$ProjectPath = (Join-Path $PSScriptRoot '..\Core\Core.csproj'),
 
     [Parameter()]
     [string]$LocalFeedPath = '\\bart\MyNuget',

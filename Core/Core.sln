@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{BCECDBC8-A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{CF699F0C-B0CE-4CAB-8AF3-8D98B892F6AA}"
 	ProjectSection(SolutionItems) = preProject
-		Publish-Nuget.ps1 = Publish-Nuget.ps1
+		..\scripts\Publish-Nuget.ps1 = ..\scripts\Publish-Nuget.ps1
 	EndProjectSection
 EndProject
 Global
