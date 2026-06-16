@@ -1,8 +1,8 @@
 # TradingSystem Core
 
-`Core.dll` is the shared base library for common primitives used by consumer applications in the TradingSystem ecosystem. It contains reusable domain helpers, value-object infrastructure, tagging utilities, environment/config helpers, file metadata helpers, and a small set of general-purpose extensions.
+`Core.dll` is the shared base library for common primitives used by consumer applications in the TradingSystem ecosystem. It contains reusable domain helpers, value-object infrastructure, tagging utilities, environment/config helpers, file metadata helpers, persistence contracts, and a small set of general-purpose extensions.
 
-This README covers the main `Core` library only. It does not cover `Core.Audio` or `Core.GoogleSheets`.
+This README covers the main `Core` library and the companion `Core.Persistence` package. It does not cover `Core.Audio` or `Core.GoogleSheets`.
 
 ## Target Framework
 
@@ -17,12 +17,12 @@ Main types and helpers exposed by `Core.dll`:
 - `ValueObject`: base class for structural equality and comparison
 - `BaseEvent` and `EventStatus`: simple event/domain record types
 - `TagList`, `TagCloud`, and `ITaggable`: lightweight tagging support
-- `App` and `AppEnv`: environment-based config and secret lookup
+- `Env`: environment-based config and secret lookup
 - `PersonalFile` and `PersonalFileDb`: file hashing and file repository helpers
 - `DateTimeOffsetExtensions`: date/time convenience methods
 - `ManualTimeProvider`: a controllable, advanceable `System.TimeProvider` for deterministic time
-- `SyncfusionLicenser`: optional Syncfusion license registration helper
 - `ComputerInfo`: Windows-specific machine information helper
+- `IDocumentStore<T>`, `IDocument`, `DocumentKey`: backend-agnostic document-persistence contracts (concrete JSON and MongoDB stores ship in the separate `Core.Persistence` package)
 
 ## Typical Usage
 
@@ -70,21 +70,21 @@ var evt = new BaseEvent
 ```csharp
 using Core;
 
-var runtime = App.Env;
-var configFile = App.GetConfigFilename("appsettings");
-var dbConnection = App.GetSecret("DbConnectionString");
+var runtime = Env.Current;
+var configFile = Env.GetConfigFilename("appsettings");
+var dbConnection = Env.GetSecret("DbConnectionString");
 ```
 
-`App` reads the `RUNTIME_ENVIRONMENT` environment variable and maps it as follows:
+`Env` reads the `RUNTIME_ENVIRONMENT` environment variable and maps it as follows:
 
-- `dev` -> `AppEnv.Dev`
-- `staging` -> `AppEnv.Staging`
-- `prod` -> `AppEnv.Prod`
+- `dev` -> `Env.Dev`
+- `staging` -> `Env.Staging`
+- `prod` -> `Env.Prod`
 
 Secret lookup conventions:
 
-- `App.GetSecret("DbConnectionString")` reads `{ENV}_DbConnectionString`
-- `App.GetGlobalSecret("SomeName")` reads `SomeName`
+- `Env.GetSecret("DbConnectionString")` reads `{ENV}_DbConnectionString`
+- `Env.GetGlobalSecret("SomeName")` reads `SomeName`
 
 ### Tags
 
@@ -148,6 +148,53 @@ TimeSpan elapsed = time.GetElapsedTime(t0); // exactly 250 ms
 
 **Timer-firing contract.** Timers never fire on their own or on a background thread; they fire synchronously during `Advance`/`SetUtcNow`. When a single advance spans several due times (including the periods of a repeating timer), callbacks run in chronological order, the correct number of times, and while each callback runs `GetUtcNow()` reports that callback's due time. The clock may only move forward — negative `Advance` deltas and backward `SetUtcNow` are rejected. All operations are thread-safe: the clock can be advanced from one thread while reads and timer callbacks happen on others.
 
+### Document persistence (`IDocumentStore<T>`)
+
+`Core` defines a small, backend-agnostic document-repository contract; the implementations live in the **`Core.Persistence`** package so bare `Core` takes no dependency on `MongoDB.Driver`.
+
+```csharp
+public interface IDocumentStore<T> where T : class
+{
+    Task<T?> GetAsync(string id, CancellationToken ct = default);
+    Task SaveAsync(T entity, CancellationToken ct = default);            // upsert
+    Task<bool> DeleteAsync(string id, CancellationToken ct = default);
+    Task<IReadOnlyList<T>> QueryAsync(Expression<Func<T, bool>> filter, CancellationToken ct = default);
+}
+```
+
+A store is keyed by an **id member**. A single expression yields both the runtime key and the MongoDB `_id` mapping, so they can never disagree:
+
+```csharp
+// Store the entity's Symbol as the document key.
+var beta = factory.Create<Beta>("Beta", collectionName: "betas", jsonSubDirectory: "betas", b => b.Symbol);
+```
+
+Entities you own may instead implement `Core.IDocument` (`string Id`), in which case the key defaults to `x => x.Id`. External or sealed models (which cannot implement `IDocument`) always work via the id-member expression, or via a custom `Func<T,string>` for composite keys (e.g. `s => $"{s.Date}_{s.Account}"`).
+
+The `Core.Persistence` package provides:
+
+- `JsonDocumentStore<T>` — one `{id}.json` file per entity, atomic temp-file-then-rename writes.
+- `MongoDocumentStore<T>` — one document per entity, atomic upserts, server-side queries.
+- `MongoConventions` — register-once serialization (enums as strings, `decimal` as `Decimal128`, offset-preserving `DateTimeOffset`).
+- `PersistenceOptions` + `IDocumentStoreFactory` — choose the JSON or MongoDB backend per store from configuration, with instant fallback.
+- `AddPersistence` / `AddDocumentStore<T>` DI helpers (the MongoDB client connects lazily, so a JSON-only configuration never requires a running `mongod`).
+
+```csharp
+using Core.Persistence;
+
+services.AddPersistence(configuration);                       // binds the "Persistence" section
+services.AddDocumentStore<Beta>("Beta", "betas", "betas", b => b.Symbol);
+```
+
+```jsonc
+"Persistence": {
+  "Mongo": { "ConnectionString": "mongodb://localhost:27017", "DatabaseName": "TradingSystem" },
+  "JsonRootPath": "C:\\Users\\me\\OneDrive\\TradingSystem",
+  "DefaultBackend": "Json",
+  "Stores": { "Beta": "Mongo", "Trade": "Json" }
+}
+```
+
 ## Publishing Core.dll
 
 Build or publish the main library from the repository root:
@@ -163,15 +210,25 @@ The folder publish output now includes:
 - supporting runtime files generated by .NET
 - this `README.md` copied into the publish folder as `README.md`
 
+To pack and push the NuGet packages to a local feed, use `scripts/Publish-Nuget.ps1`. By default it publishes **both** `Core` and `Core.Persistence`:
+
+```powershell
+.\scripts\Publish-Nuget.ps1 -LocalFeedPath '\\server\share\NuGet' -Configuration Release
+```
+
+Pass `-ProjectPaths` to publish a specific set of projects, or `-ProjectPath` for a single project.
+
 ## Consumer Notes
 
 - `ComputerInfo` uses `System.Management` and is Windows-specific.
-- `SyncfusionLicenser.Register(version)` looks for a machine-level environment variable named like `SYNCFUSIONKEY_27_2_2`.
 - `Core` is built with warnings treated as errors, so downstream source changes should be kept clean when contributing back to this repo.
 
 ## Repository Layout
 
 - `Core/`: main library source
 - `Core.Tests/`: tests for the main library
+- `Core.Persistence/`: JSON and MongoDB implementations of `IDocumentStore<T>`
+- `Core.Persistence.Tests/`: tests for `Core.Persistence` (uses EphemeralMongo)
 - `Core.Audio/`: separate Windows-only audio library, not covered here
 - `Core.GoogleSheets/`: separate Google Sheets library, not covered here
+- `scripts/`: build/publish scripts (`Publish-Nuget.ps1`)
