@@ -366,3 +366,5 @@ FodyWeavers.xsd
 # Code coverage reports
 coveragereport/
 TestResults/
+
+.github/

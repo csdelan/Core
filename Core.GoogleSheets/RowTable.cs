@@ -307,7 +307,7 @@ namespace Core.GoogleSheets
                 return ((DateTime)v).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             }
             if (t == typeof(bool)) return ((bool)v) ? "TRUE" : "FALSE";
-            if (t.IsEnum) return v.ToString();
+            if (t.IsEnum) return v.ToString() ?? string.Empty;
             return v;
         }
 
@@ -379,6 +379,13 @@ namespace Core.GoogleSheets
             }
         }
 
+        /// <summary>Copy formatting from one row to another</summary>
+        private async Task CopyRowFormattingAsync(int sourceRow, int targetRow, CancellationToken ct)
+        {
+            var request = await CreateCopyFormattingRequestAsync(sourceRow, targetRow, ct);
+            await _ws.BatchUpdateAsync(new List<Request> { request }, ct);
+        }
+
         /// <summary>Append multiple rows with formatting copied from the previous row</summary>
         private async Task AppendRowsWithFormattingAsync(IList<IList<object>> rowsValues, CancellationToken ct)
         {
@@ -397,7 +404,7 @@ namespace Core.GoogleSheets
                 for (int i = 0; i < rowsValues.Count; i++)
                 {
                     var newRowIndex = lastRowIndex.Value + 1 + i;
-                    requests.Add(CreateCopyFormattingRequest(lastRowIndex.Value, newRowIndex));
+                    requests.Add(await CreateCopyFormattingRequestAsync(lastRowIndex.Value, newRowIndex, ct));
                 }
 
                 if (requests.Count > 0)
@@ -426,19 +433,12 @@ namespace Core.GoogleSheets
             return null;
         }
 
-        /// <summary>Copy formatting from one row to another</summary>
-        private async Task CopyRowFormattingAsync(int sourceRow, int targetRow, CancellationToken ct)
-        {
-            var request = CreateCopyFormattingRequest(sourceRow, targetRow);
-            await _ws.BatchUpdateAsync(new List<Request> { request }, ct);
-        }
-
         /// <summary>Create a request to copy formatting from source row to target row</summary>
-        private Request CreateCopyFormattingRequest(int sourceRow, int targetRow)
+        private async Task<Request> CreateCopyFormattingRequestAsync(int sourceRow, int targetRow, CancellationToken ct)
         {
-            var sheetId = _ws.GetSheetIdAsync().Result; // Consider making this async if needed
+            var sheetId = await _ws.GetSheetIdAsync(ct);
             
-            return new Request
+            var request = new Request
             {
                 CopyPaste = new CopyPasteRequest
                 {
@@ -461,9 +461,9 @@ namespace Core.GoogleSheets
                     PasteType = "PASTE_FORMAT" // Copy only formatting, not values
                 }
             };
+            
+            return request;
         }
-
-        // ... rest of existing methods remain the same ...
     }
 
     #endregion

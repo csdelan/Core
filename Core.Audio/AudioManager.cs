@@ -22,7 +22,7 @@ namespace Common
         {
             while (!e.Cancel)
             {
-                if (sequentialSoundPlayers.TryDequeue(out AudioTrack trackPlayer) == true)
+                if (sequentialSoundPlayers.TryDequeue(out AudioTrack? trackPlayer) == true)
                 {
                     if (trackPlayer == null || trackPlayer.Uri == null)
                     {

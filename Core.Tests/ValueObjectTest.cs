@@ -211,7 +211,7 @@ namespace Core.Tests
             TestValueObject? obj2 = null;
             
             // Act & Assert
-            Assert.True(obj1 == obj2);
+            Assert.True(obj1! == obj2!);
         }
 
         [Fact]
@@ -222,8 +222,8 @@ namespace Core.Tests
             TestValueObject? obj2 = null;
             
             // Act & Assert
-            Assert.False(obj1 == obj2);
-            Assert.False(obj2 == obj1);
+            Assert.False(obj1 == obj2!);
+            Assert.False(obj2! == obj1);
         }
 
         [Fact]

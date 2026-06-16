@@ -72,7 +72,7 @@ namespace Core.GoogleSheets
             var sheet = ss.Sheets?.FirstOrDefault(s => s.Properties.Title == SheetName)
                        ?? throw new InvalidOperationException($"Sheet '{SheetName}' not found.");
             _sheetIdCache = sheet.Properties.SheetId;
-            return _sheetIdCache.Value;
+            return _sheetIdCache!.Value;
         }
 
         public async Task BatchUpdateAsync(IList<Request> requests, CancellationToken ct = default)
