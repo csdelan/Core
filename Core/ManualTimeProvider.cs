@@ -222,7 +222,45 @@ namespace Core
                 target = _now + delta;
             }
 
-            SetUtcNow(target);
+            AdvanceTo(target);
+        }
+
+        // Like SetUtcNow but silently returns when _now has already passed target,
+        // so concurrent Advance calls from multiple threads don't throw on each other.
+        private void AdvanceTo(DateTimeOffset value)
+        {
+            value = value.ToUniversalTime();
+
+            while (true)
+            {
+                ManualTimer? toFire = null;
+                lock (_lock)
+                {
+                    if (value <= _now)
+                        return;
+
+                    DateTimeOffset earliest = DateTimeOffset.MaxValue;
+                    foreach (ManualTimer timer in _timers)
+                    {
+                        if (timer.Wakeup is DateTimeOffset wakeup && wakeup <= value && wakeup < earliest)
+                        {
+                            earliest = wakeup;
+                            toFire = timer;
+                        }
+                    }
+
+                    if (toFire is null)
+                    {
+                        _now = value;
+                        return;
+                    }
+
+                    _now = earliest;
+                    toFire.RescheduleAfterFire();
+                }
+
+                toFire.Invoke();
+            }
         }
 
         /// <summary>
