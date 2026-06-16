@@ -1,7 +1,14 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$ProjectPath = (Join-Path $PSScriptRoot '..\Core\Core.csproj'),
+    [string[]]$ProjectPaths = @(
+        (Join-Path $PSScriptRoot '..\Core\Core.csproj'),
+        (Join-Path $PSScriptRoot '..\Core.Persistence\Core.Persistence.csproj')
+    ),
+
+    # Back-compat: a single -ProjectPath overrides -ProjectPaths when supplied.
+    [Parameter()]
+    [string]$ProjectPath,
 
     [Parameter()]
     [string]$LocalFeedPath = '\\bart\MyNuget',
@@ -12,6 +19,10 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+if (-not [string]::IsNullOrWhiteSpace($ProjectPath)) {
+    $ProjectPaths = @($ProjectPath)
+}
 
 function Write-Step {
     param([string]$Message)
@@ -79,15 +90,59 @@ function Get-ProjectPackageVersion {
     return "$($versionPrefix.Trim())-$($versionSuffix.Trim())"
 }
 
-$resolvedProjectPath = [System.IO.Path]::GetFullPath($ProjectPath)
-if (-not (Test-Path -LiteralPath $resolvedProjectPath)) {
-    throw "Project file not found: $resolvedProjectPath"
+function Publish-Project {
+    param(
+        [string]$ProjectPath,
+        [string]$LocalFeedFullPath,
+        [string]$Configuration
+    )
+
+    $resolvedProjectPath = [System.IO.Path]::GetFullPath($ProjectPath)
+    if (-not (Test-Path -LiteralPath $resolvedProjectPath)) {
+        throw "Project file not found: $resolvedProjectPath"
+    }
+
+    $projectDirectory = Split-Path -Parent $resolvedProjectPath
+    $artifactsPath = Join-Path $projectDirectory 'artifacts'
+    $packageVersion = Get-ProjectPackageVersion -ProjectFilePath $resolvedProjectPath
+
+    Write-Step 'Cleaning previous package artifacts'
+    if (Test-Path -LiteralPath $artifactsPath) {
+        Remove-Item -LiteralPath $artifactsPath -Recurse -Force
+    }
+    Ensure-DirectoryExists -Path $artifactsPath
+
+    Write-Step "Building $resolvedProjectPath with package version $packageVersion"
+    dotnet build $resolvedProjectPath --configuration $Configuration --nologo /p:UpdateVersionProperties=false /p:Version=$packageVersion /p:PackageVersion=$packageVersion | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw 'dotnet build failed.'
+    }
+
+    Write-Step "Packing $resolvedProjectPath with package version $packageVersion"
+    dotnet pack $resolvedProjectPath --configuration $Configuration --no-build --output $artifactsPath --nologo /p:UpdateVersionProperties=false /p:Version=$packageVersion /p:PackageVersion=$packageVersion | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw 'dotnet pack failed.'
+    }
+
+    $packages = Get-ChildItem -Path $artifactsPath -Filter '*.nupkg' | Where-Object { $_.Name -notlike '*.symbols.nupkg' }
+    if (-not $packages) {
+        throw "No NuGet packages were produced in $artifactsPath"
+    }
+
+    $published = @()
+    foreach ($package in $packages) {
+        Write-Step "Publishing $($package.Name) to $LocalFeedFullPath"
+        dotnet nuget push $package.FullName --source $LocalFeedFullPath --skip-duplicate | Out-Host
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to publish package $($package.FullName)"
+        }
+        $published += $package.Name
+    }
+
+    return $published
 }
 
-$projectDirectory = Split-Path -Parent $resolvedProjectPath
 $localFeedFullPath = Resolve-LocalFeedPath -Path $LocalFeedPath
-$artifactsPath = Join-Path $projectDirectory 'artifacts'
-$packageVersion = Get-ProjectPackageVersion -ProjectFilePath $resolvedProjectPath
 
 Write-Step 'Ensuring prerequisites'
 Ensure-GitVersionTool
@@ -95,36 +150,13 @@ Ensure-GitVersionTool
 Write-Step "Creating local feed folder at $localFeedFullPath"
 Ensure-DirectoryExists -Path $localFeedFullPath
 
-Write-Step 'Cleaning previous package artifacts'
-if (Test-Path -LiteralPath $artifactsPath) {
-    Remove-Item -LiteralPath $artifactsPath -Recurse -Force
-}
-Ensure-DirectoryExists -Path $artifactsPath
-
-Write-Step "Building $resolvedProjectPath with package version $packageVersion"
-dotnet build $resolvedProjectPath --configuration $Configuration --nologo /p:UpdateVersionProperties=false /p:Version=$packageVersion /p:PackageVersion=$packageVersion
-if ($LASTEXITCODE -ne 0) {
-    throw 'dotnet build failed.'
-}
-
-Write-Step "Packing $resolvedProjectPath with package version $packageVersion"
-dotnet pack $resolvedProjectPath --configuration $Configuration --no-build --output $artifactsPath --nologo /p:UpdateVersionProperties=false /p:Version=$packageVersion /p:PackageVersion=$packageVersion
-if ($LASTEXITCODE -ne 0) {
-    throw 'dotnet pack failed.'
-}
-
-$packages = Get-ChildItem -Path $artifactsPath -Filter '*.nupkg' | Where-Object { $_.Name -notlike '*.symbols.nupkg' }
-if (-not $packages) {
-    throw "No NuGet packages were produced in $artifactsPath"
-}
-
-foreach ($package in $packages) {
-    Write-Step "Publishing $($package.Name) to $localFeedFullPath"
-    dotnet nuget push $package.FullName --source $localFeedFullPath --skip-duplicate
-    if ($LASTEXITCODE -ne 0) {
-        throw "Failed to publish package $($package.FullName)"
-    }
+$allPublished = @()
+foreach ($project in $ProjectPaths) {
+    $allPublished += Publish-Project -ProjectPath $project -LocalFeedFullPath $localFeedFullPath -Configuration $Configuration
 }
 
 Write-Step 'Completed successfully'
-Write-Host "Published package(s) to: $localFeedFullPath" -ForegroundColor Green
+Write-Host "Published the following package(s) to: $localFeedFullPath" -ForegroundColor Green
+foreach ($name in $allPublished) {
+    Write-Host "  - $name" -ForegroundColor Green
+}
