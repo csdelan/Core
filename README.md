@@ -20,6 +20,7 @@ Main types and helpers exposed by `Core.dll`:
 - `App` and `AppEnv`: environment-based config and secret lookup
 - `PersonalFile` and `PersonalFileDb`: file hashing and file repository helpers
 - `DateTimeOffsetExtensions`: date/time convenience methods
+- `ManualTimeProvider`: a controllable, advanceable `System.TimeProvider` for deterministic time
 - `SyncfusionLicenser`: optional Syncfusion license registration helper
 - `ComputerInfo`: Windows-specific machine information helper
 
@@ -102,6 +103,50 @@ using Core;
 var rounded = DateTimeOffset.Now.TruncateToMinute();
 var customDay = DateTimeOffset.Now.WithDay(15);
 ```
+
+### Controllable time (`ManualTimeProvider`)
+
+`Core` builds on the BCL `System.TimeProvider` abstraction so the whole ecosystem can share a single, testable notion of time. Depend on `TimeProvider` everywhere you need the current instant, a `Stopwatch`-style elapsed measurement, or a timer — never on `DateTime.UtcNow` directly.
+
+- **Production** uses the real clock: `TimeProvider.System`.
+- **Deterministic simulation and tests** use `Core.ManualTimeProvider`, whose clock only moves when you advance it. Crucially, timers created against it fire when — and only when — the clock is advanced across their due time, so a long-running service can be driven through a simulated timeline.
+
+Both are registered as the single `TimeProvider` service. With `Microsoft.Extensions.DependencyInjection` (a dependency of the *consumer* app, not of bare `Core`):
+
+```csharp
+// Production
+services.AddSingleton(TimeProvider.System);
+
+// Simulation / tests
+services.AddSingleton<TimeProvider>(new ManualTimeProvider());
+```
+
+`Core` itself takes no DI-container dependency; consumers register the chosen `TimeProvider` using whatever container they already use.
+
+Driving the clock:
+
+```csharp
+using Core;
+
+var time = new ManualTimeProvider(); // starts at the fixed epoch 2000-01-01T00:00:00Z
+
+// A timer that fires only when the clock is advanced across its due time.
+using var timer = time.CreateTimer(
+    _ => Console.WriteLine("fired"),
+    state: null,
+    dueTime: TimeSpan.FromSeconds(10),
+    period: Timeout.InfiniteTimeSpan);
+
+time.Advance(TimeSpan.FromSeconds(9));  // nothing fires yet
+time.Advance(TimeSpan.FromSeconds(1));  // due time crossed -> "fired"
+
+// GetUtcNow and GetElapsedTime stay consistent under the manual clock.
+long t0 = time.GetTimestamp();
+time.Advance(TimeSpan.FromMilliseconds(250));
+TimeSpan elapsed = time.GetElapsedTime(t0); // exactly 250 ms
+```
+
+**Timer-firing contract.** Timers never fire on their own or on a background thread; they fire synchronously during `Advance`/`SetUtcNow`. When a single advance spans several due times (including the periods of a repeating timer), callbacks run in chronological order, the correct number of times, and while each callback runs `GetUtcNow()` reports that callback's due time. The clock may only move forward — negative `Advance` deltas and backward `SetUtcNow` are rejected. All operations are thread-safe: the clock can be advanced from one thread while reads and timer callbacks happen on others.
 
 ## Publishing Core.dll
 

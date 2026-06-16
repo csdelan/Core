@@ -67,6 +67,7 @@ dotnet tool install --global GitVersion.Tool
 
 ## Notable Code Areas
 
+- `Core\ManualTimeProvider.cs`: controllable, advanceable `System.TimeProvider` (timers fire on `Advance`)
 - `Core\ValueObject.cs`: structural equality base type
 - `Core\BaseEvent.cs`: event lifecycle model
 - `Core\Env.cs`: environment/secret lookup helpers
