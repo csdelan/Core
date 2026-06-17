@@ -17,7 +17,7 @@ Main types and helpers exposed by `Core.dll`:
 - `ValueObject`: base class for structural equality and comparison
 - `BaseEvent` and `EventStatus`: simple event/domain record types
 - `TagList`, `TagCloud`, and `ITaggable`: lightweight tagging support
-- `Env`: environment-based config and secret lookup
+- `App.Env`: environment-based config and secret lookup
 - `PersonalFile` and `PersonalFileDb`: file hashing and file repository helpers
 - `DateTimeOffsetExtensions`: date/time convenience methods
 - `ManualTimeProvider`: a controllable, advanceable `System.TimeProvider` for deterministic time
@@ -71,21 +71,21 @@ var evt = new BaseEvent
 ```csharp
 using Core;
 
-var runtime = Env.Current;
-var configFile = Env.GetConfigFilename("appsettings");
-var dbConnection = Env.GetSecret("DbConnectionString");
+var runtime = App.Env.Current;
+var configFile = App.Env.GetConfigFilename("appsettings");
+var dbConnection = App.Env.GetSecret("DbConnectionString");
 ```
 
-`Env` reads the `RUNTIME_ENVIRONMENT` environment variable and maps it as follows:
+`App.Env` reads the `RUNTIME_ENVIRONMENT` environment variable and maps it as follows:
 
-- `dev` -> `Env.Dev`
-- `staging` -> `Env.Staging`
-- `prod` -> `Env.Prod`
+- `dev` -> `App.Env.Dev`
+- `staging` -> `App.Env.Staging`
+- `prod` -> `App.Env.Prod`
 
 Secret lookup conventions:
 
-- `Env.GetSecret("DbConnectionString")` reads `{ENV}_DbConnectionString`
-- `Env.GetGlobalSecret("SomeName")` reads `SomeName`
+- `App.Env.GetSecret("DbConnectionString")` reads `{ENV}_DbConnectionString`
+- `App.Env.GetGlobalSecret("SomeName")` reads `SomeName`
 
 ### Tags
 
