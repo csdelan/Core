@@ -18,7 +18,7 @@ param(
     [string]$Configuration = 'Debug',
 
     [Parameter()]
-    [string]$PackageReleaseNotes
+    [string]$ReleaseNotes
 )
 
 $ErrorActionPreference = 'Stop'
@@ -98,7 +98,7 @@ function Publish-Project {
         [string]$ProjectPath,
         [string]$LocalFeedFullPath,
         [string]$Configuration,
-        [string]$PackageReleaseNotes
+        [string]$ReleaseNotes
     )
 
     $resolvedProjectPath = [System.IO.Path]::GetFullPath($ProjectPath)
@@ -137,8 +137,8 @@ function Publish-Project {
         "/p:PackageVersion=$packageVersion"
     )
 
-    if (-not [string]::IsNullOrWhiteSpace($PackageReleaseNotes)) {
-        $packArguments += "/p:PackageReleaseNotes=$PackageReleaseNotes"
+    if (-not [string]::IsNullOrWhiteSpace($ReleaseNotes)) {
+        $packArguments += "/p:PackageReleaseNotes=$ReleaseNotes"
     }
 
     & dotnet @packArguments | Out-Host
@@ -174,7 +174,7 @@ Ensure-DirectoryExists -Path $localFeedFullPath
 
 $allPublished = @()
 foreach ($project in $ProjectPaths) {
-    $allPublished += Publish-Project -ProjectPath $project -LocalFeedFullPath $localFeedFullPath -Configuration $Configuration -PackageReleaseNotes $PackageReleaseNotes
+    $allPublished += Publish-Project -ProjectPath $project -LocalFeedFullPath $localFeedFullPath -Configuration $Configuration -ReleaseNotes $ReleaseNotes
 }
 
 Write-Step 'Completed successfully'
