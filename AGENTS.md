@@ -78,6 +78,7 @@ dotnet tool install --global GitVersion.Tool
 - `Core\PersonalFile*.cs`: file metadata and file database helpers
 - `Core\TagList.cs` and `Core\TagCloud.cs`: tagging utilities
 - `Core\IDocumentStore.cs`, `Core\IDocument.cs`, `Core\DocumentKey.cs`: backend-agnostic document-persistence contracts and id-member helpers
+- `Core\CoreJson.cs`: canonical, frozen `JsonSerializerOptions` (`Core.Json.CoreJson`) — the BCL-only JSON policy (camelCase props, PascalCase string enums, lossless `decimal`, ISO-8601 UTC dates) that `MongoConventions` mirrors for BSON
 - `Core.Persistence\JsonDocumentStore.cs` and `Core.Persistence\MongoDocumentStore.cs`: the JSON and MongoDB store implementations
 - `Core.Persistence\MongoConventions.cs`: register-once MongoDB serialization (enums as strings, `decimal` as `Decimal128`, offset-preserving `DateTimeOffset`, id → `_id`)
 - `Core.Persistence\DocumentStoreFactory.cs` and `Core.Persistence\ServiceCollectionExtensions.cs`: per-store JSON/Mongo backend selection and DI registration

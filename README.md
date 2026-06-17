@@ -1,6 +1,6 @@
 # TradingSystem Core
 
-`Core.dll` is the shared base library for common primitives used by consumer applications in the TradingSystem ecosystem. It contains reusable domain helpers, value-object infrastructure, tagging utilities, environment/config helpers, file metadata helpers, persistence contracts, and a small set of general-purpose extensions.
+`Core.dll` is the shared base library for common primitives used by consumer applications in the TradingSystem ecosystem. It contains reusable domain helpers, value-object infrastructure, tagging utilities, environment/config helpers, file metadata helpers, persistence contracts, the canonical JSON serialization policy, and a small set of general-purpose extensions.
 
 This README covers the main `Core` library and the companion `Core.Persistence` package. It does not cover `Core.Audio` or `Core.GoogleSheets`.
 
@@ -23,6 +23,7 @@ Main types and helpers exposed by `Core.dll`:
 - `ManualTimeProvider`: a controllable, advanceable `System.TimeProvider` for deterministic time
 - `ComputerInfo`: Windows-specific machine information helper
 - `IDocumentStore<T>`, `IDocument`, `DocumentKey`: backend-agnostic document-persistence contracts (concrete JSON and MongoDB stores ship in the separate `Core.Persistence` package)
+- `Core.Json.CoreJson`: the canonical, frozen `JsonSerializerOptions` shared across wire, storage, and config (BCL-only, no third-party serializers)
 
 ## Typical Usage
 
@@ -147,6 +148,37 @@ TimeSpan elapsed = time.GetElapsedTime(t0); // exactly 250 ms
 ```
 
 **Timer-firing contract.** Timers never fire on their own or on a background thread; they fire synchronously during `Advance`/`SetUtcNow`. When a single advance spans several due times (including the periods of a repeating timer), callbacks run in chronological order, the correct number of times, and while each callback runs `GetUtcNow()` reports that callback's due time. The clock may only move forward — negative `Advance` deltas and backward `SetUtcNow` are rejected. All operations are thread-safe: the clock can be advanced from one thread while reads and timer callbacks happen on others.
+
+### JSON serialization policy (`Core.Json.CoreJson`)
+
+`CoreJson` is the single canonical source of `JsonSerializerOptions` for the ecosystem, so on-disk JSON, ZMQ wire payloads, and (via a mirrored convention) MongoDB BSON cannot silently disagree on enum/date/decimal formatting. It depends only on `System.Text.Json` — no third-party serializers, no domain knowledge.
+
+```csharp
+using Core.Json;
+
+// Compact, for wire and storage (the forward-looking default — most JSON is machine-read).
+string wire = JsonSerializer.Serialize(order, CoreJson.Default);
+
+// Same policy, pretty-printed — for human-edited config such as system-config.json.
+File.WriteAllText("system-config.json", JsonSerializer.Serialize(config, CoreJson.Indented));
+```
+
+`CoreJson.Default` and `CoreJson.Indented` are **frozen** (`MakeReadOnly`) so the shared instances cannot be mutated. To extend the policy with an extra converter, take a mutable copy and modify that:
+
+```csharp
+JsonSerializerOptions extended = CoreJson.CreateOptions();   // == new JsonSerializerOptions(CoreJson.Default)
+extended.Converters.Add(new MyCustomConverter());
+```
+
+The canonical policy (stated authoritatively in the XML docs, and the contract other layers mirror) is based on `JsonSerializerDefaults.Web`, then:
+
+- **Property names:** camelCase on write, case-insensitive on read — round-trips existing on-disk files written with plain Web defaults.
+- **Enums:** serialized as strings via `JsonStringEnumConverter`, with member names preserved as authored (PascalCase, no camelCase policy); reads are case-insensitive.
+- **Decimal:** full-precision `System.Decimal`, never routed through `double` (money/quantities stay lossless).
+- **DateTimeOffset / DateTime:** ISO-8601 round-trip; callers are expected to store UTC instants.
+- **Numbers:** keeps the Web default `NumberHandling` (numbers may be read from strings).
+
+`Core.Persistence.MongoConventions` mirrors this same policy for BSON (enums as strings, `decimal` as `Decimal128`, offset-preserving `DateTimeOffset`), keeping the JSON and Mongo representations in agreement.
 
 ### Document persistence (`IDocumentStore<T>`)
 
