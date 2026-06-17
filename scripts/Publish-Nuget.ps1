@@ -15,7 +15,10 @@ param(
 
     [Parameter()]
     [ValidateSet('Debug', 'Release')]
-    [string]$Configuration = 'Debug'
+    [string]$Configuration = 'Debug',
+
+    [Parameter()]
+    [string]$PackageReleaseNotes
 )
 
 $ErrorActionPreference = 'Stop'
@@ -94,7 +97,8 @@ function Publish-Project {
     param(
         [string]$ProjectPath,
         [string]$LocalFeedFullPath,
-        [string]$Configuration
+        [string]$Configuration,
+        [string]$PackageReleaseNotes
     )
 
     $resolvedProjectPath = [System.IO.Path]::GetFullPath($ProjectPath)
@@ -119,7 +123,25 @@ function Publish-Project {
     }
 
     Write-Step "Packing $resolvedProjectPath with package version $packageVersion"
-    dotnet pack $resolvedProjectPath --configuration $Configuration --no-build --output $artifactsPath --nologo /p:UpdateVersionProperties=false /p:Version=$packageVersion /p:PackageVersion=$packageVersion | Out-Host
+    $packArguments = @(
+        'pack'
+        $resolvedProjectPath
+        '--configuration'
+        $Configuration
+        '--no-build'
+        '--output'
+        $artifactsPath
+        '--nologo'
+        '/p:UpdateVersionProperties=false'
+        "/p:Version=$packageVersion"
+        "/p:PackageVersion=$packageVersion"
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($PackageReleaseNotes)) {
+        $packArguments += "/p:PackageReleaseNotes=$PackageReleaseNotes"
+    }
+
+    & dotnet @packArguments | Out-Host
     if ($LASTEXITCODE -ne 0) {
         throw 'dotnet pack failed.'
     }
@@ -152,7 +174,7 @@ Ensure-DirectoryExists -Path $localFeedFullPath
 
 $allPublished = @()
 foreach ($project in $ProjectPaths) {
-    $allPublished += Publish-Project -ProjectPath $project -LocalFeedFullPath $localFeedFullPath -Configuration $Configuration
+    $allPublished += Publish-Project -ProjectPath $project -LocalFeedFullPath $localFeedFullPath -Configuration $Configuration -PackageReleaseNotes $PackageReleaseNotes
 }
 
 Write-Step 'Completed successfully'
