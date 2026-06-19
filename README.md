@@ -24,6 +24,7 @@ Main types and helpers exposed by `Core.dll`:
 - `ComputerInfo`: Windows-specific machine information helper
 - `IDocumentStore<T>`, `IDocument`, `DocumentKey`: backend-agnostic document-persistence contracts (concrete JSON and MongoDB stores ship in the separate `Core.Persistence` package)
 - `Core.Json.CoreJson`: the canonical, frozen `JsonSerializerOptions` shared across wire, storage, and config (BCL-only, no third-party serializers)
+- `IBackgroundJob`, `JobExecutionContext`, and `BackgroundJobExecutor`: key-based background job dispatch; jobs are resolved per-execution inside a fresh DI scope with structured start/finish logging
 
 ## Typical Usage
 
@@ -148,6 +149,54 @@ TimeSpan elapsed = time.GetElapsedTime(t0); // exactly 250 ms
 ```
 
 **Timer-firing contract.** Timers never fire on their own or on a background thread; they fire synchronously during `Advance`/`SetUtcNow`. When a single advance spans several due times (including the periods of a repeating timer), callbacks run in chronological order, the correct number of times, and while each callback runs `GetUtcNow()` reports that callback's due time. The clock may only move forward — negative `Advance` deltas and backward `SetUtcNow` are rejected. All operations are thread-safe: the clock can be advanced from one thread while reads and timer callbacks happen on others.
+
+### Background jobs
+
+`Core` provides a lightweight key-based background job system built on the standard DI abstractions.
+
+**Implement a job:**
+
+```csharp
+using Core;
+
+public sealed class ReportJob : IBackgroundJob
+{
+    public string Key => "daily-report";
+
+    public async Task ExecuteAsync(JobExecutionContext context, CancellationToken cancellationToken)
+    {
+        var region = context.Parameters.GetValueOrDefault("region", "us-east");
+        // ... do work ...
+    }
+}
+```
+
+**Register with DI:**
+
+```csharp
+services.AddScoped<ReportJob>();
+services.AddSingleton<IBackgroundJob, ReportJob>(); // used only to populate the key→type map
+services.AddSingleton<BackgroundJobExecutor>();
+```
+
+**Dispatch:**
+
+```csharp
+await executor.ExecuteAsync("daily-report", new Dictionary<string, string>
+{
+    ["region"] = "us-east"
+});
+```
+
+`BackgroundJobExecutor` is a singleton. Each call to `ExecuteAsync` creates a fresh DI scope, resolves the job type from that scope, builds a `JobExecutionContext` with a new `JobId` (GUID) and `ScheduledAt` set to `DateTimeOffset.UtcNow`, then calls the job's `ExecuteAsync`. Start and finish are logged at `Information` level. An unknown `jobKey` throws `InvalidOperationException`.
+
+`JobExecutionContext` properties:
+
+| Property | Type | Description |
+|---|---|---|
+| `JobId` | `string` | New GUID (`"N"` format) generated per execution |
+| `ScheduledAt` | `DateTimeOffset` | UTC instant the job was dispatched |
+| `Parameters` | `Dictionary<string, string>` | Caller-supplied key/value pairs (empty by default) |
 
 ### JSON serialization policy (`Core.Json.CoreJson`)
 

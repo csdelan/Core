@@ -1,3 +1,4 @@
+using Core.BackgroundJobs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

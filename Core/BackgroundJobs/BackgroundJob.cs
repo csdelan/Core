@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core
+namespace Core.BackgroundJobs
 {
     /// <summary>
     /// Represents a background job that can be executed asynchronously.

@@ -99,6 +99,24 @@ Reads the Syncfusion license from a **machine-level** environment variable named
 ### `ComputerInfo` (`Core/ComputerInfo.cs`)
 Uses WMI (`System.Management`) to query CPU processor ID. **Windows-only** — throws `PlatformNotSupportedException` on non-Windows platforms.
 
+### `IBackgroundJob` / `BackgroundJobExecutor` (`Core/BackgroundJob.cs`, `Core/BackgroundJobExecutor.cs`)
+
+Key-based background job dispatch built on the standard DI abstractions.
+
+- **`IBackgroundJob`** — contract for a job: `string Key` (unique identifier) and `Task ExecuteAsync(JobExecutionContext, CancellationToken)`.
+- **`JobExecutionContext`** — per-execution context passed into every job:
+  - `JobId`: new GUID (`"N"` format) generated each run.
+  - `ScheduledAt`: `DateTimeOffset.UtcNow` at dispatch time.
+  - `Parameters`: `Dictionary<string, string>` of caller-supplied values (defaults to empty).
+- **`BackgroundJobExecutor`** (singleton) — built from `IEnumerable<IBackgroundJob>` (to populate the key → type map) plus `IServiceProvider` and `ILogger`. Each `ExecuteAsync(jobKey, parameters?)` call creates a fresh `IServiceScope`, resolves the concrete job type from that scope, and invokes the job. Logs `Information`-level start and finish entries. Throws `InvalidOperationException` for unrecognized keys.
+
+Registration pattern:
+```csharp
+services.AddScoped<ReportJob>();
+services.AddSingleton<IBackgroundJob, ReportJob>(); // populates the key→type map only
+services.AddSingleton<BackgroundJobExecutor>();
+```
+
 ### `DateTimeOffsetExtensions` (`Core/DateTimeOffsetExtensions.cs`)
 Extension methods: `WithDay`, `WithDayAndMonth`, `TruncateToMinute`.
 
