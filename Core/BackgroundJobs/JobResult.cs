@@ -1,4 +1,4 @@
-namespace Core.BackgroundJobs
+namespace Core
 {
     /// <summary>
     /// Outcome of a single <see cref="IBackgroundJob"/> run. Captures success/failure, timing, and

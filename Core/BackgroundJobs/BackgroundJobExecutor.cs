@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Core.BackgroundJobs
+namespace Core
 {
     /// <summary>
     /// Executes background jobs by resolving them from the service provider and invoking their execution logic.

@@ -16,7 +16,7 @@ Packages published from this repository to the local NuGet feed (`\\bart\MyNuget
 
 | Date | Package | Version | Notes |
 | --- | --- | --- | --- |
-| 2026-07-04 | Core | 2.1.0 | Fix missing period in TruncateToMinute XML doc comment (republish) |
+| 2026-07-04 | Core | 2.1.0 | Fix missing period in TruncateToMinute XML doc comment (republish); republished: Fix inadvertent Core.BackgroundJobs namespace regression - restore flat Core namespace for BackgroundJob, BackgroundJobExecutor, JobResult, JobRunRegistry |
 | 2026-06-19 | Core.Persistence | 2.0.0 | Initial publish |
 | 2026-06-19 | Core | 2.0.0 | Published alongside Core.Persistence 2.0.0 |
 | 2026-04-25 | Core | 1.0.0 | Initial publish |

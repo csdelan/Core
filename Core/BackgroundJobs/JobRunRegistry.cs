@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Core.BackgroundJobs
+namespace Core
 {
     /// <summary>
     /// In-memory record of the most recent <see cref="JobResult"/> per job key. Thread-safe singleton
