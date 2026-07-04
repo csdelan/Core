@@ -19,7 +19,7 @@
         }
 
         /// <summary>
-        /// Truncates a DateTimeOffset to the nearest minute by removing seconds and milliseconds
+        /// Truncates a DateTimeOffset to the nearest minute by removing seconds and milliseconds.
         /// </summary>
         public static DateTimeOffset TruncateToMinute(this DateTimeOffset dateTime)
         {

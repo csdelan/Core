@@ -23,7 +23,6 @@ dotnet test .\Core.Tests\Core.Tests.csproj --nologo
 dotnet build .\Core.Persistence\Core.Persistence.csproj -c Debug --nologo
 dotnet test .\Core.Persistence.Tests\Core.Persistence.Tests.csproj --nologo
 dotnet build .\Core.GoogleSheets\Core.GoogleSheets.csproj -c Debug --nologo
-.\scripts\Publish-Nuget.ps1 -LocalFeedPath '.\LocalNuGetFeed' -Configuration Debug
 ```
 
 Use project-level builds when you do not need the full solution. That is usually faster and avoids unnecessary failures from platform-specific projects. In particular, `dotnet build .\Core\Core.sln` fails under the .NET CLI because `Core.Audio` uses a COM reference (`ResolveComReference`) that only the full MSBuild/Visual Studio toolchain supports — build the individual `net10.0` projects instead.
@@ -32,19 +31,8 @@ Use project-level builds when you do not need the full solution. That is usually
 
 - `Core\Core.csproj` and `Core.Persistence\Core.Persistence.csproj` each pack both `README.md` and `AGENTS.md` into their NuGet package.
 - `README.md` is also declared as the package readme via `PackageReadmeFile`.
-- Use `scripts\Publish-Nuget.ps1` to build, pack, and push the packages to a local folder feed or UNC share. By default it publishes **both** `Core` and `Core.Persistence`.
-- Override the targets with `-ProjectPaths` (an array) or `-ProjectPath` (a single project, back-compat).
-- `LocalFeedPath` supports both relative paths such as `.\LocalNuGetFeed` and rooted UNC paths such as `\\server\share\NuGet`.
-- For UNC usage, the share itself must already exist. The script can create subfolders inside an existing share, but it cannot create the SMB share.
-- Package artifacts are written to each project's `artifacts\` folder (e.g. `Core\artifacts\`, `Core.Persistence\artifacts\`) before being pushed.
-- The script skips symbol packages and pushes only `.nupkg` files.
-
-### Package Versioning
-
-- Each packable project declares `VersionPrefix` as the intended package version source.
-- `scripts\Publish-Nuget.ps1` reads the version from each project file and passes it explicitly to `dotnet build` and `dotnet pack`.
-- The script sets `/p:UpdateVersionProperties=false` so `GitVersion.MsBuild` does not rewrite the NuGet package version to its fallback value.
-- To change a published NuGet version for this workflow, update `VersionPrefix` in that project's `.csproj`.
+- Publishing to the local feed (`\\bart\MyNuget`) is handled by the `nuget-publish` AI agent skill, not a repo-local script. See `NUGET-PACKAGES.md` at the repo root for the current published version of each package and its version history.
+- Each packable project declares `VersionPrefix` as the intended package version source; the skill bumps it for new work or republishes the same version to fix a broken same-session deployment.
 
 ## Important Constraints
 
