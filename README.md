@@ -18,6 +18,7 @@ Main types and helpers exposed by `Core.dll`:
 - `BaseEvent` and `EventStatus`: simple event/domain record types
 - `TagList`, `TagCloud`, and `ITaggable`: lightweight tagging support
 - `App.Env`: environment-based config and secret lookup
+- `IConfigurationBuilder.AddMarketDataSecrets()`: cross-platform shared-secrets loader (see below)
 - `PersonalFile` and `PersonalFileDb`: file hashing and file repository helpers
 - `DateTimeOffsetExtensions`: date/time convenience methods
 - `ManualTimeProvider`: a controllable, advanceable `System.TimeProvider` for deterministic time
@@ -27,6 +28,47 @@ Main types and helpers exposed by `Core.dll`:
 - `IBackgroundJob`, `JobExecutionContext`, and `BackgroundJobExecutor`: key-based background job dispatch; jobs are resolved per-execution inside a fresh DI scope with structured start/finish logging
 
 ## Typical Usage
+
+### Shared secrets (`AddMarketDataSecrets`)
+
+Load shared, non-source-controlled secrets the same way in **every** service, on any OS. One JSON file
+holds many secrets (e.g. the Mongo connection string); only the file's *location* varies per machine.
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddMarketDataSecrets();   // namespace Microsoft.Extensions.Configuration
+```
+
+Sources are layered, later winning:
+
+1. **Conventional file** — `%APPDATA%\MarketData\secrets.json` on Windows, `~/.config/MarketData/secrets.json`
+   on Linux/macOS.
+2. **Explicit file** at the path in the **`MARKETDATA_SECRETS`** environment variable — e.g.
+   `/etc/marketdata/secrets.json` on a server, or a mounted container secret.
+3. **Environment variables** — for one-off overrides or container injection (`Persistence__Mongo__ConnectionString`
+   maps to `Persistence:Mongo:ConnectionString`).
+
+Every file source is optional, so a host still starts where no file is present (e.g. a container that
+supplies secrets purely via environment variables). The file itself is a normal hierarchical
+`appsettings`-style JSON document:
+
+```json
+{
+  "Persistence": { "Mongo": { "ConnectionString": "mongodb+srv://…" } }
+}
+```
+
+Per environment:
+
+- **Windows dev:** drop `secrets.json` at `%APPDATA%\MarketData\`, or set `MARKETDATA_SECRETS` to an
+  existing path. No code change.
+- **Linux server:** put the same file at `/etc/marketdata/secrets.json` and set `MARKETDATA_SECRETS`, **or**
+  just set the `Persistence__Mongo__ConnectionString` env var — no file needed.
+- **Containers:** mount the secret file (+ `MARKETDATA_SECRETS`), or inject env vars.
+
+Convention: database and collection names are **per-service** config (in each service's `appsettings`),
+never in the secrets file. To graduate to a secrets manager (Azure Key Vault, HashiCorp Vault) later,
+add its configuration provider inside `AddMarketDataSecrets` — one place, no per-service edits.
 
 ### Value objects
 
